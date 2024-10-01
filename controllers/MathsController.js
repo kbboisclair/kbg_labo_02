@@ -59,11 +59,14 @@ export default class MathsController extends Controller {
                 data.error = `x parameter is not a number`;
                 this.HttpContext.response.JSON(data);
                 return;
-            } else if (isNaN(params.y)) {
+            } 
+            
+            if (isNaN(params.y)) {
                 data.error = `y parameter is not a number`;
                 this.HttpContext.response.JSON(data);
                 return;
-            }
+            } 
+
         } else if (["!", "p", "np"].includes(params.op)) {
             if (isNaN(params.n)) {
                 data.error = `n parameter is not a number`;
