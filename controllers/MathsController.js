@@ -112,7 +112,7 @@ export default class MathsController extends Controller {
 
         // Calcul
         switch (params.op) {
-            case " ":
+            case "+":
                 data.op = "+";
                 data.value = parseFloat(params.x) + parseFloat(params.y);
                 break;
