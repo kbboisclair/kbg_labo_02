@@ -1,11 +1,12 @@
 // import BookmarkModel from '../models/bookmark.js';
 // import Repository from '../models/repository.js';
 import Controller from './Controller.js';
-import * as mathUtilities from "../utilities.js";
+import * as mathUtilities from "../mathUtilities.js";
 
 export default class MathsController extends Controller {
     constructor(HttpContext) {
         super(HttpContext);
+        
     } 
 
     get(id) {
@@ -14,6 +15,9 @@ export default class MathsController extends Controller {
         let params = this.HttpContext.path.params;
         let receivedParams = Object.keys(params);
         let data = params;
+        let x = null;
+        let y = null;
+        let n = null;
         
         // Valider si l'opérateur est défini !!!!!!!!! A FAIRE
 
@@ -55,6 +59,19 @@ export default class MathsController extends Controller {
 
         // Validation des nombres
         if ([" ", "-", "*", "/", "%"].includes(params.op)) {
+            
+            if(params.x === null){
+                data.error = `x parameter is missing`;
+                this.HttpContext.response.JSON(data);
+                return;
+            }
+            
+            if(params.y === null){
+                data.error = `y parameter is missing`;
+                this.HttpContext.response.JSON(data);
+                return;
+            }
+            
             if (isNaN(params.x)) {
                 data.error = `x parameter is not a number`;
                 this.HttpContext.response.JSON(data);
@@ -66,10 +83,25 @@ export default class MathsController extends Controller {
                 this.HttpContext.response.JSON(data);
                 return;
             } 
+            
+            x = parseFloat(params.x);
+            y = parseFloat(params.y);
+            data.x = parseFloat(params.x);
+            data.y = parseFloat(params.y);
+            
 
         } else if (["!", "p", "np"].includes(params.op)) {
             if (isNaN(params.n)) {
                 data.error = `n parameter is not a number`;
+                this.HttpContext.response.JSON(data);
+                return;
+            } 
+            
+            n = parseFloat(params.n);
+            data.n = n;
+
+            if (!Number.isInteger(n) || n <= 0) {
+                data.error = "n parameter must be an integer > 0";
                 this.HttpContext.response.JSON(data);
                 return;
             }
@@ -86,20 +118,22 @@ export default class MathsController extends Controller {
                 break;
             case "*":
                 data.value = parseFloat(params.x) * parseFloat(params.y);
+
                 break;
             case "/":
-                if (parseFloat(params.y) === 0) {
-                    data.value = `Infinity`;
+                if (y === 0 && x === 0) {  // Division de 0 par 0
+                    data.value = "NaN";
+                } else if (y === 0) {      // Division par 0
+                    data.value = "Infinity";
                 } else {
-                    data.value = parseFloat(params.x) / parseFloat(params.y);
+                    data.value = x / y;    // Division normale
                 }
                 break;
-            case "%":
-                let result = parseFloat(params.x) % parseFloat(params.y);  
-                if (!result || isNaN(result)){
-                    data.value = `NaN`;
+            case "%":               
+                if (y === 0) {  // Vérifier la division par 0
+                    data.value = "NaN";
                 } else {
-                    data.value = result;
+                    data.value = x % y;  // Effectuer l'opération modulo
                 }
                 break;
             case "!":
