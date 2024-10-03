@@ -59,14 +59,17 @@ export default class MathsController extends Controller {
 
         // Validation des nombres
         if ([" ", "-", "*", "/", "%"].includes(params.op)) {
-            
-            if(params.x === null){
+            if(params.op === " "){
+                data.op = "+";
+            }
+
+            if(!params.x || params.x === null){
                 data.error = `x parameter is missing`;
                 this.HttpContext.response.JSON(data);
                 return;
             }
             
-            if(params.y === null){
+            if(!params.y || params.y === null){
                 data.error = `y parameter is missing`;
                 this.HttpContext.response.JSON(data);
                 return;
