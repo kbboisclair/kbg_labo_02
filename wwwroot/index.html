@@ -1,80 +1,322 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service call</title>
+    <style>
+      * {
+        margin: 0px;
+        padding: 0px;
+        box-sizing: border-box;
+      }
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>KBG-API Server</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/site.css" />
-    <link rel="icon" href="images/favicon.png">
-</head>
+      #main {
+        max-width: 1024px;
+        margin: auto;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        border: 1px solid #ccc;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        height: 100vh;
+      }
 
-<body>
-    <img src="images/favicon.png" alt="" class="icon">
-    <h1>KBG - AP SERVER</h1>
-    <h3>Auteur: Nicolas Chourot</h3>
-    <h3>Département d'informatique</h3>
-    <h3>Collège Lionel-Groulx</h3>
-    <hr>
-    <br>
-    <br>
-    <div style="margin:auto; width:90%">
-        <h1>Liste des services</h1>
+      button {
+        height: 40px;
+      }
 
-        <h2><a href="api/contacts" target="_blank">Contacts</a></h2>
-        <div class="endpoints">
-            <span>GET</span>
-            <span>api/contacts</span>
-            <span></span>
+      fieldset {
+        display: grid;
+        grid-template-columns: 5fr 1fr 2fr;
+        align-items: center;
+        padding: 20px;
+        gap: 10px;
+        justify-content: flex-start;
+      }
 
-            <span>GET</span>
-            <span>api/contacts/id</span>
-            <span></span>
-
-            <span>POST</span>
-            <span>api/contacts</span>
-            <span>{ "Name": string, "Phone": string, "Email": string } Name doit être unique</span>
-
-            <span>PUT</span>
-            <span>api/contacts/id</span>
-            <span>{ "Name": string, "Phone": string, "Email": string } Name doit être unique</span>
-
-            <span>DELETE</span>
-            <span>api/contacts/id</span>
-            <span></span>
-
-        </div>
-        <br>
-
-        <h2><a href="api/bookmarks" target="_blank">Bookmarks</a></h2>
-        <div class="endpoints">
-            <span>GET</span>
-            <span>api/bookmarks</span>
-            <span></span>
-
-            <span>GET</span>
-            <span>api/bookmarks/id</span>
-            <span></span>
-
-            <span>POST</span>
-            <span>api/bookmarks</span>
-            <span>{ "Title": string, "Url": string, "Category": string } Title doit être unique</span>
-
-            <span>PUT</span>
-            <span>api/bookmarks/id</span>
-            <span>{ "Title": string, "Url": string, "Category": string } Title doit être unique</span>
-
-            <span>DELETE</span>
-            <span>api/bookmarks/id</span>
-            <span></span>
-
-        </div>
-
+      textarea {
+        max-width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main">
+      <h1>Test du service api/Maths</h1>
+      <hr />
+      <br />
+      <fieldset>
+        <legend>Url du service</legend>
+        <input
+          id="url"
+          type="text"
+          placeholder="URL"
+          value="http://pk-kbg-labo02.glitch.me"
+        />
+        <p>/api/Maths</p>
+        <button type="button" id="call">Démarrer le test</button>
+      </fieldset>
+      <textarea id="jsonResult" cols="30" rows="50"></textarea>
+      <fieldset>
+        <legend>Verdict</legend>
+        <p id="ClientResult"></p>
+      </fieldset>
     </div>
-    <script>
-        console.log("index");
-    </script>
-</body>
 
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script defer>
+      let serverValid = true;
+      $("#call").on("click", async () => {
+        $("#jsonResult").val("");
+        let host = $("#url").val() + "/api/Maths";
+        $("#ClientResult").text("En cours de traitement...");
+
+        await Maths_API_getMaths(host, "?op=+&x=-111&y=-244", showResult);
+        await Maths_API_getMaths(host, "?op=-&x=1&y=abc", showResult);
+        await Maths_API_getMaths(host, "?op=-&x=-111&y=244", showResult);
+        await Maths_API_getMaths(host, "?op=*&x=11.56&y=244.12345", showResult);
+        await Maths_API_getMaths(host, "?op=/&x=99&y=11.06", showResult);
+        await Maths_API_getMaths(host, "?op=/&x=99&y=0", showResult);
+        await Maths_API_getMaths(host, "?op=/&x=0&y=0", showResult);
+        await Maths_API_getMaths(host, "?op=%&x=5&y=5", showResult);
+        await Maths_API_getMaths(host, "?op=%&x=100&y=13", showResult);
+        await Maths_API_getMaths(host, "?op=%&x=100&y=0", showResult);
+        await Maths_API_getMaths(host, "?n=0&op=!", showResult);
+        await Maths_API_getMaths(host, "?n=0&op=p", showResult);
+        await Maths_API_getMaths(host, "?n=1&op=p", showResult);
+        await Maths_API_getMaths(host, "?n=5&op=p", showResult);
+        await Maths_API_getMaths(host, "?n=6&op=p", showResult);
+        await Maths_API_getMaths(host, "?n=6.5&op=p", showResult);
+        await Maths_API_getMaths(host, "?n=113&op=p", showResult);
+        await Maths_API_getMaths(host, "?n=114&op=p", showResult);
+        await Maths_API_getMaths(host, "?n=1&op=np", showResult);
+        await Maths_API_getMaths(host, "?n=30&op=np", showResult);
+        await Maths_API_getMaths(host, "?op=+&x=&y=244", showResult); 
+        await Maths_API_getMaths(host, "?op=+&x=111&y=", showResult); 
+        await Maths_API_getMaths(host, "?op=+&x=111&y=244&z=0", showResult);
+        await Maths_API_getMaths(host, "?n=5&op=!&z=0", showResult);
+        await Maths_API_getMaths(host, "?n=5.5&op=!", showResult);
+        await Maths_API_getMaths(host, "?z=0", showResult);
+        await Maths_API_getMaths(host, "?n=-5&op=!", showResult);
+        await Maths_API_getMaths(host, "?x=null", showResult);
+
+
+        if (serverValid) {
+          $("#ClientResult").text("Bravo aucun problème !!");
+        } else {
+          $("#ClientResult").text("Le serveur est invalide");
+        }
+      });
+
+      async function Maths_API_getMaths(host, operation, showResult) {
+        return new Promise((resolve) => {
+          $.ajax({
+            url: host + operation,
+            dataType: "json",
+            success: (data) => {
+              showResult(data);
+              resolve(data);
+            },
+            error: (xhr) => {
+              console.log(xhr);
+              serverValid = false;
+              resolve(null);
+            },
+          });
+        });
+      }
+
+      function showResult(data) {
+        let result = data;
+        let resultText = "";
+        //verify if the is not null
+        if (result != null) {
+          resultText = ValidResult(result);
+          let pastResult =
+            $("#jsonResult").val() == "" ? "" : $("#jsonResult").val() + "\n";
+          pastResult += resultText;
+          $("#jsonResult").val(pastResult);
+        }
+
+        //
+      }
+
+      function ValidResult(result) {
+        let resultText = "";
+        let validResult = false;
+        console.log("RECU_X: " + result.x);
+        console.log("RECU_Y: " + result.y);
+        console.log("RECU_N: " + result.n);
+        console.log("RECU_OP: " + result.op);
+        console.log("RECU_VALUE: " + result.value);
+        console.log("RECU_ERROR: " + result.error);
+
+        // list the possible error before entering the result
+        if (result.error !== undefined) {
+          // At this point, we know we have an error
+          keysAllowed = ["x", "y", "n", "op", "value", "error"];
+          const resultParam = Object.keys(result);
+          const maxParam = 4; //assuming (x, y) || n && op && value || error
+          console.log("TEST_ERROR: " + (isNaN(result.n)));
+          let ValidError =
+            (result.error === "'op' parameter is missing" &&
+              (result.op == null || result.op == undefined)) ||
+            (result.error === "y parameter is not a number" &&
+              result.y != null &&
+              isNaN(result.y)) ||
+            (result.error === "x parameter is not a number" &&
+              result.x != null &&
+              isNaN(result.x)) ||
+            (result.error === "n parameter is not a number" &&
+              result.n != null &&
+              isNaN(result.n)) ||
+            (result.error === "n parameter must be an integer > 0" &&
+              result.n != null &&
+              !isNaN(result.n) &&
+              (Number(result.n) <= 0 || Number(result.n) % 1 !== 0)) ||
+            (result.error === "y parameter is missing" &&
+              (result.y == null || result.y == undefined || result.y == "" )) ||
+            (result.error === "x parameter is missing" &&
+              (result.x == null || result.x == undefined ||result.x == "" )) 
+            ||
+            ((result.error === "too many parameters" &&
+              resultParam.length > maxParam) ||
+            !verifyKeysMatch(keysAllowed, result));
+
+          if (ValidError) {
+            resultText = `OK ---> ${JSON.stringify(result)}`;
+          } else {
+            resultText = `ERROR ---> ${JSON.stringify(result)}`;
+            serverValid = false;
+          }
+        } else {
+          
+          switch (result.op) {
+            case "+":
+              validResult =
+                Number(result.value) == Number(result.x) + Number(result.y);
+              break;
+            case "-":
+              validResult =
+                Number(result.value) == Number(result.x) - Number(result.y);
+              break;
+            case "*":
+              validResult =
+                Number(result.value) == Number(result.x) * Number(result.y);
+              break;
+            case "/": // division
+              validResult =
+                result.value == String(Number(result.x) / Number(result.y));
+              break;
+            case "%": // modulo
+              validResult =
+                String(result.value) ==
+                String(Number(result.x) % Number(result.y));
+              break;
+            case "!": //nombre entier
+              validResult = Number(result.value) == factorial(Number(result.n));
+              break;
+            case "p":
+              validResult =
+                String(result.value) == String(isPrime(Number(result.n)));
+              break;
+            case "np":
+              validResult = Number(result.value) == findPrime(Number(result.n));
+              break;
+            default:
+              validResult = false;
+          }
+          if (validResult) {
+            resultText = `OK ---> ${JSON.stringify(result)}`;
+          } else {
+            resultText = `ERROR ---> ${JSON.stringify(result)}`;
+            serverValid = false;
+          }
+        }
+
+        return resultText;
+      }
+      function verifyKeysMatch(keysAllowed, object) {
+        const keys = Object.keys(object);
+        for (let key of keys) {
+          if (!keysAllowed.includes(key)) {
+            return false;
+          }
+        }
+        return true;
+      }
+      function findPrime(n) {
+        let primeNumber = 0;
+        for (let i = 0; i < n; i++) {
+          primeNumber++;
+          while (!isPrime(primeNumber)) {
+            primeNumber++;
+          }
+        }
+        return primeNumber;
+      }
+      function factorial(n) {
+        if (n === 0 || n === 1) {
+          return 1;
+        }
+        return n * factorial(n - 1);
+      }
+      function isPrime(value) {
+        for (var i = 2; i < value; i++) {
+          if (value % i === 0) {
+            return false;
+          }
+        }
+        return value > 1;
+      }
+      function displayData(object) {}
+      /*
+            function resetJsonResult() {
+                $("#jsonResult").val('');
+            }
+            function setJsonResult(json) {
+                $("#jsonResult").val(JSON.stringify(json));
+            }
+
+            function getHeaderAttribute(xhr, attribute) {
+                return xhr.getResponseHeader(attribute);
+            }
+
+            async function callAPI_JS(url) {
+                const response = await new Promise(resolve => {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", url);
+                    xhr.onload = function (e) {
+                        if (xhr.status == 200)
+                            resolve(xhr.response);
+                        else
+                            resolve(xhr.status);
+                    };
+                    xhr.send();
+                })
+                return JSON.parse(response);
+            }
+
+            async function callAPI_JQ(url) {
+                return await new Promise(resolve => {
+                    $.ajax({
+                        url: url,
+                        success: (data, status, xhr) => { resolve(data); },
+                        error: xhr => { resolve(xhr.status); }
+                    });
+                });
+            }
+
+            async function callAPI_Fetch(url) {
+                const response = await fetch(url);
+                if (response.ok)
+                    return response.json();
+                else
+                    return response.status;
+            }
+            */
+    </script>
+  </body>
 </html>

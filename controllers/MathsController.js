@@ -2,6 +2,8 @@
 // import Repository from '../models/repository.js';
 import Controller from './Controller.js';
 import * as mathUtilities from "../mathUtilities.js";
+import path from 'path';
+import fs from 'fs';
 
 export default class MathsController extends Controller {
     constructor(HttpContext) {
@@ -10,9 +12,17 @@ export default class MathsController extends Controller {
     } 
 
     get(id) {
+
+        let query = this.HttpContext.path.queryString;
+        if(query == '?'){
+            let resourcePath = path.join(process.cwd(), wwwroot, "API-Help/maths-help.html");
+            this.HttpContext.response.HTML(fs.readFileSync(resourcePath));
+            return;
+        }
+
+        let params = this.HttpContext.path.params;
         const validOps = [" ", "-", "*", "/", "%", "!", "p", "np"];
         let expectedParams = ["op"];
-        let params = this.HttpContext.path.params;
         let receivedParams = Object.keys(params);
         let data = params;
         let x = null;
@@ -20,6 +30,7 @@ export default class MathsController extends Controller {
         let n = null;
         
         // Valider si l'opérateur est défini !!!!!!!!! A FAIRE
+        
 
         // Validation de l'opérateur     
         if (!receivedParams.includes("op")) {   // Si l'opérateur n'est pas spécifié
