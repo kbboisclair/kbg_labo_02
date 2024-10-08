@@ -164,4 +164,20 @@ export default class MathsController extends Controller {
         // Retourner le resultat
         this.HttpContext.response.JSON(data);
     }
+
+    post(data) {
+        this.HttpContext.response.badRequest("The Id of ressource is not specified in the request url.")
+    }
+
+    put(data) {
+        this.HttpContext.response.notImplemented("This functionality has not been implemented yet.");
+    }
+    remove(id) {
+        this.HttpContext.response.notImplemented("This functionality has not been implemented yet.");
+
+    }
+    remove(id) {
+        this.HttpContext.response.notImplemented("This functionality has not been implemented yet.");
+    }
+
 }
